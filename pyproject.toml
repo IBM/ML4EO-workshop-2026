@@ -1,0 +1,32 @@
+[project]
+name = "ml4eo-workshop-2026"
+version = "0.1.0"
+description = "Workshop for the Machine Learning for Earth Observation conference 2026"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+    {"name"="Rosie Lickorish"},
+    {"name"="Helen Tamura-Wicks"},
+    {"name"="Geoffrey Dawson"},
+    {"name"="Anne Jones"},
+    ]
+
+dependencies = [
+    "terratorch",
+    "terratorch-iterate",
+    "terrakit",
+]
+
+[dependency-groups]
+dev = [
+    "detect-secrets",
+    "ipykernel>=7.2.0",
+    "jupyter>=1.1.1",
+    "ruff>=0.14.13",
+]
+
+[tool.uv.sources]
+detect-secrets = { git = "https://github.com/ibm/detect-secrets.git", rev = "master" }
+terratorch = { git = "https://github.com/helen-tamura-wicks/terratorch.git", rev = "main" }
+terrakit = { path = "/Users/rosielickorish/Documents/IBMResearch/2026/terrakit", editable = true }
+
