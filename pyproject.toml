@@ -28,5 +28,4 @@ dev = [
 [tool.uv.sources]
 detect-secrets = { git = "https://github.com/ibm/detect-secrets.git", rev = "master" }
 terratorch = { git = "https://github.com/helen-tamura-wicks/terratorch.git", rev = "main" }
-terrakit = { path = "/Users/rosielickorish/Documents/IBMResearch/2026/terrakit", editable = true }
-
+terrakit = { git = "https://github.com/torchgeo/terrakit.git", rev = "feature/tile_group_index" }
