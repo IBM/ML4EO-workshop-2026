@@ -164,3 +164,28 @@ def plot_panel(ax, data, title, cmap=None, vmin=None, vmax=None, is_categorical=
     ax.axis('off')
 
 # Made with Bob
+
+
+
+def get_multiclass_colormap():
+    """
+    Get colormap and labels for multi-class saltmarsh zone classification.
+    
+    Returns:
+        tuple: (cmap, class_labels, class_colors) for 4-class zonal classification
+    """
+    from matplotlib.colors import ListedColormap
+    
+    # Multi-class: 0=Not Saltmarsh, 1=Pioneer, 2=Mid-Low, 3=Upper
+    zone_styles = {
+        0: {'label': 'Not Saltmarsh', 'color': '#d9d9d9'},
+        1: {'label': 'Pioneer', 'color': '#fdae61'},
+        2: {'label': 'Mid-Low', 'color': '#abd9e9'},
+        3: {'label': 'Upper', 'color': '#2c7bb6'},
+    }
+    
+    class_colors = [zone_styles[i]['color'] for i in range(4)]
+    class_cmap = ListedColormap(class_colors)
+    class_labels = [zone_styles[i]['label'] for i in range(4)]
+    
+    return class_cmap, class_labels, class_colors
