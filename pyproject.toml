@@ -15,7 +15,7 @@ dependencies = [
     "terratorch",
     "terratorch-iterate",
     "terrakit>=0.1.8.post1",
-
+    "huggingface-hub",
 ]
 
 [dependency-groups]
@@ -28,4 +28,3 @@ dev = [
 
 [tool.uv.sources]
 detect-secrets = { git = "https://github.com/ibm/detect-secrets.git", rev = "master" }
-terratorch = { git = "https://github.com/helen-tamura-wicks/terratorch.git", rev = "main" }
