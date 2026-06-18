@@ -1,7 +1,8 @@
+#!/usr/bin/env python3
+
 # © Copyright IBM Corporation 2026
 # SPDX-License-Identifier: Apache-2.0
 
-#!/usr/bin/env python3
 """
 Trial script for iterate HPO over the salt marsh downstream segmentation task.
 
