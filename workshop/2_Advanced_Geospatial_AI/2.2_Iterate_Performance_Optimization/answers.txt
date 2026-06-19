@@ -1,0 +1,47 @@
+1) To add batch size, your 'hpo_config.yaml' should look like:
+
+metrics:
+  - val_loss  # Metric to optimize (minimize validation loss)
+
+static:
+  config: config_salt_marsh.yaml  # Base terratorch configuration
+  epochs: 2               # Number of epochs per trial
+
+hpo:
+  # Batch size - categorical choice
+  batch_size:
+    type: categorical
+    choices: [2, 4]
+  
+  # Learning rate (contiuous, log normal sampling )
+  lr:
+    type: float
+    low: 1.0e-6
+    high: 1.0e-3
+    log: true
+
+
+2) To add a head dropout you need to modify the 'hpo_config.yaml' to: 
+
+metrics:
+  - val_loss  # Metric to optimize (minimize validation loss)
+
+static:
+  config: config_salt_marsh.yaml  # Base terratorch configuration
+  epochs: 2               # Number of epochs per trial
+
+hpo:
+  head_dropout:
+    type: float
+    low: 0.0
+    high: 0.5
+    log: false
+  # Learning rate (contiuous, log normal sampling )
+  lr:
+    type: float
+    low: 1.0e-6
+    high: 1.0e-3
+    log: true
+
+you also need add this to line 136 to 'train_salt_marsh_trial.py' as it has not been added to param_mappings
+"head_dropout": "--model.init_args.model_args.head_dropout",
