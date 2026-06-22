@@ -16,6 +16,7 @@ dependencies = [
     "terratorch-iterate",
     "terrakit>=0.1.8.post1",
     "huggingface-hub",
+    "gdown>=6.1.0",
 ]
 
 [dependency-groups]

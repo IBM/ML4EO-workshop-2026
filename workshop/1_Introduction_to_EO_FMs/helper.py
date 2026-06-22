@@ -16,6 +16,7 @@ import numpy as np
 import rasterio
 from huggingface_hub import hf_hub_download
 from matplotlib.colors import LogNorm
+from tqdm.auto import tqdm
 
 
 def download_model_from_hf(repo_id, config_name, checkpoint_name, project_root):
@@ -31,7 +32,6 @@ def download_model_from_hf(repo_id, config_name, checkpoint_name, project_root):
     Returns:
         tuple: (config_path, checkpoint_path) - Paths to downloaded files
     """
-    from tqdm.auto import tqdm
 
     # Download config
     config_folder = project_root / "configs" / "inference"
@@ -221,3 +221,373 @@ def get_multiclass_colormap():
     class_labels = [zone_styles[i]["label"] for i in range(4)]
 
     return class_cmap, class_labels, class_colors
+
+
+def locate_checkpoints(search_dir: Path) -> list:
+    """Locate checkpoints that are contained in a given directory
+
+    Returns:
+        list: checkpoints that were found
+    """
+    # search for checkpoints
+    new_checkpoint_dir = list(search_dir.rglob("*.ckpt"))
+    if len(new_checkpoint_dir) > 0:
+        print(f"Found {len(new_checkpoint_dir)} files:")
+        for ckpt in new_checkpoint_dir:
+            print(f"  - {ckpt}")
+    else:
+        print("⚠ No checkpoints found in the directory.")
+
+    return new_checkpoint_dir
+
+
+def download_and_extract_zip(
+    file_id, zip_filename="dataset.zip", extract_to="../../data"
+):
+    """
+    Download a zip file from Google Drive and extract it.
+
+    Args:
+        file_id: Google Drive file ID
+        zip_filename: Name for the downloaded zip file (default: "dataset.zip")
+        extract_to: Directory to extract the contents to (default: "../../data")
+
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    import os
+    import subprocess
+
+    import gdown
+
+    # Download the zip file from Google Drive
+    if not os.path.isfile(zip_filename):
+        print("Downloading dataset from Google Drive...")
+        try:
+            gdown.download(
+                f"https://drive.google.com/uc?id={file_id}", zip_filename, quiet=False
+            )
+            print(f"✓ Downloaded to {zip_filename}")
+        except Exception as e:
+            print(f"⚠ Download error: {e}")
+            return False
+    else:
+        print(f"✓ Zip file already exists: {zip_filename}")
+
+    # Extract the zip file
+    if os.path.isfile(zip_filename):
+        print(f"\nExtracting to {extract_to}...")
+        try:
+            result = subprocess.run(
+                ["unzip", "-q", "-o", zip_filename, "-d", extract_to],
+                capture_output=True,
+                text=True,
+            )
+            if result.returncode == 0:
+                print("✓ Extraction complete!")
+                return True
+            else:
+                print(f"⚠ Extraction error: {result.stderr}")
+                return False
+        except Exception as e:
+            print(f"⚠ Extraction error: {e}")
+            return False
+
+    return False
+
+
+def plot_s2_model_pred(s2_img_file, s2_lab_file, s2_pred_file):
+    """
+    Plot S2 model predictions with input imagery, ground truth labels, and predictions.
+
+    Args:
+        s2_img_file: Path to S2 input image file
+        s2_lab_file: Path to S2 label file
+        s2_pred_file: Path or list of paths to S2 prediction file(s)
+
+    Returns:
+        None (displays plot)
+    """
+    from matplotlib.colors import ListedColormap
+    from matplotlib.patches import Patch
+
+    # Set up for extent model (binary classification)
+    CLASS_COLORS = ["#d9d9d9", "#2c7bb6"]  # Not Saltmarsh, Saltmarsh
+    CLASS_CMAP = ListedColormap(CLASS_COLORS)
+    CLASS_LABELS = ["Not Saltmarsh", "Saltmarsh"]
+    N_CLASSES = 2
+
+    # Handle prediction file as list or single path
+    pred_file = s2_pred_file[0] if isinstance(s2_pred_file, list) else s2_pred_file
+
+    # Load S2 data
+    img_data = normalize_rgb(load_raster(s2_img_file, rgb_only=True))
+    lab_data = load_raster(s2_lab_file)
+    pred_data = load_raster(pred_file)
+
+    # Create figure with 1 row × 3 columns
+    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+    fig.suptitle("S2 Model Results (10m resolution)", fontsize=16, fontweight="bold")
+
+    # Plot panels
+    plot_panel(axes[0], img_data, "Input S2 Imagery")
+    plot_panel(
+        axes[1],
+        lab_data,
+        "Ground Truth Labels",
+        cmap=CLASS_CMAP,
+        is_categorical=True,
+        n_classes=N_CLASSES,
+    )
+    plot_panel(
+        axes[2],
+        pred_data,
+        "Model Predictions",
+        cmap=CLASS_CMAP,
+        is_categorical=True,
+        n_classes=N_CLASSES,
+    )
+
+    # Add legend
+    legend_elements = [
+        Patch(facecolor=CLASS_COLORS[i], label=CLASS_LABELS[i])
+        for i in range(len(CLASS_LABELS))
+    ]
+    fig.legend(
+        handles=legend_elements,
+        loc="lower center",
+        ncol=2,
+        fontsize=11,
+        frameon=True,
+        bbox_to_anchor=(0.5, -0.05),
+    )
+
+    plt.tight_layout()
+    plt.show()
+
+    print(f"\n✓ Visualized S2 model results")
+    print(f"  Image: {Path(s2_img_file).name}")
+    print(f"  Label: {Path(s2_lab_file).name}")
+    print(f"  Prediction: {Path(pred_file).name}")
+
+
+def plot_s2_rgbdem_model_pred(
+    s2_img_file,
+    s2_lab_file,
+    s2_pred_file,
+    rgbdem_img_file,
+    rgbdem_dem_file,
+    rgbdem_lab_file,
+    rgbdem_pred_file,
+):
+    """
+    Plot comparison of S2 and RGB+DEM model predictions side by side.
+
+    Args:
+        s2_img_file: Path to S2 input image file
+        s2_lab_file: Path to S2 label file
+        s2_pred_file: Path or list of paths to S2 prediction file(s)
+        rgbdem_img_file: Path to RGB+DEM input image file
+        rgbdem_dem_file: Path to DEM file
+        rgbdem_lab_file: Path to RGB+DEM label file
+        rgbdem_pred_file: Path or list of paths to RGB+DEM prediction file(s)
+
+    Returns:
+        None (displays plot)
+    """
+    from matplotlib.colors import ListedColormap
+    from matplotlib.patches import Patch
+
+    # Set up for extent model (binary classification)
+    CLASS_COLORS = ["#d9d9d9", "#2c7bb6"]  # Not Saltmarsh, Saltmarsh
+    CLASS_CMAP = ListedColormap(CLASS_COLORS)
+    CLASS_LABELS = ["Not Saltmarsh", "Saltmarsh"]
+    N_CLASSES = 2
+
+    # Handle prediction files as lists or single paths
+    s2_pred = s2_pred_file[0] if isinstance(s2_pred_file, list) else s2_pred_file
+    rgbdem_pred = (
+        rgbdem_pred_file[0] if isinstance(rgbdem_pred_file, list) else rgbdem_pred_file
+    )
+
+    # Load S2 data (10m resolution)
+    s2_img_data = normalize_rgb(load_raster(s2_img_file, rgb_only=True))
+    s2_lab_data = load_raster(s2_lab_file)
+    s2_pred_data = load_raster(s2_pred)
+
+    # Load RGB+DEM data (2m resolution)
+    rgbdem_img_data = normalize_rgb(load_raster(rgbdem_img_file, rgb_only=True))
+    rgbdem_dem_data = load_raster(rgbdem_dem_file)
+    rgbdem_lab_data = load_raster(rgbdem_lab_file)
+    rgbdem_pred_data = load_raster(rgbdem_pred)
+
+    # Create figure with 2 rows × 4 columns
+    fig, axes = plt.subplots(2, 4, figsize=(20, 10))
+    fig.suptitle(
+        "Model Comparison: S2 (10m) vs RGB+DEM (2m)", fontsize=16, fontweight="bold"
+    )
+
+    # Row 1: S2 Model (10m resolution)
+    plot_panel(axes[0, 0], s2_img_data, "S2 - Input Imagery (10m)")
+    plot_panel(axes[0, 1], None, "S2 - DEM (N/A)")  # Blank for S2
+    plot_panel(
+        axes[0, 2],
+        s2_lab_data,
+        "S2 - Labels",
+        cmap=CLASS_CMAP,
+        is_categorical=True,
+        n_classes=N_CLASSES,
+    )
+    plot_panel(
+        axes[0, 3],
+        s2_pred_data,
+        "S2 - Predictions",
+        cmap=CLASS_CMAP,
+        is_categorical=True,
+        n_classes=N_CLASSES,
+    )
+
+    # Row 2: RGB+DEM Model (2m resolution)
+    plot_panel(axes[1, 0], rgbdem_img_data, "RGB+DEM - Input Imagery (2m)")
+    plot_panel(axes[1, 1], rgbdem_dem_data, "RGB+DEM - DEM (10m)", is_dem=True)
+    plot_panel(
+        axes[1, 2],
+        rgbdem_lab_data,
+        "RGB+DEM - Labels",
+        cmap=CLASS_CMAP,
+        is_categorical=True,
+        n_classes=N_CLASSES,
+    )
+    plot_panel(
+        axes[1, 3],
+        rgbdem_pred_data,
+        "RGB+DEM - Predictions",
+        cmap=CLASS_CMAP,
+        is_categorical=True,
+        n_classes=N_CLASSES,
+    )
+
+    # Add legend
+    legend_elements = [
+        Patch(facecolor=CLASS_COLORS[i], label=CLASS_LABELS[i])
+        for i in range(len(CLASS_LABELS))
+    ]
+    fig.legend(
+        handles=legend_elements,
+        loc="lower center",
+        ncol=2,
+        fontsize=11,
+        frameon=True,
+        bbox_to_anchor=(0.5, -0.02),
+    )
+
+    plt.tight_layout()
+    plt.show()
+
+    print(f"\n✓ Comparison visualization complete")
+    print(f"\nS2 Model (10m):")
+    print(f"  Image: {Path(s2_img_file).name}")
+    print(f"  Label: {Path(s2_lab_file).name}")
+    print(f"  Prediction: {Path(s2_pred).name}")
+    print(f"\nRGB+DEM Model (2m):")
+    print(f"  Image: {Path(rgbdem_img_file).name}")
+    print(f"  DEM: {Path(rgbdem_dem_file).name}")
+    print(f"  Label: {Path(rgbdem_lab_file).name}")
+    print(f"  Prediction: {Path(rgbdem_pred).name}")
+
+
+def clip_raster_to_size(
+    input_path, output_path, width=400, height=400, x_offset=0, y_offset=0
+):
+    """
+    Clip a raster file to a specified size from a given offset.
+
+    Args:
+        input_path: Path to input raster file
+        output_path: Path to save clipped raster
+        width: Width of output raster in pixels (default: 400)
+        height: Height of output raster in pixels (default: 400)
+        x_offset: X offset from top-left corner (default: 0)
+        y_offset: Y offset from top-left corner (default: 0)
+
+    Returns:
+        Path: Path to the clipped output file
+    """
+    from pathlib import Path
+
+    import rasterio
+    from rasterio.windows import Window
+
+    input_path = Path(input_path)
+    output_path = Path(output_path)
+
+    # Create output directory if it doesn't exist
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with rasterio.open(input_path) as src:
+        # Define the window to read (x_offset, y_offset, width, height)
+        window = Window(x_offset, y_offset, width, height)
+
+        # Read the data for this window
+        data = src.read(window=window)
+
+        # Update metadata for the clipped raster
+        out_meta = src.meta.copy()
+        out_meta.update(
+            {
+                "height": height,
+                "width": width,
+                "transform": rasterio.windows.transform(window, src.transform),
+            }
+        )
+
+        # Write the clipped raster
+        with rasterio.open(output_path, "w", **out_meta) as dst:
+            dst.write(data)
+
+    print(f"✓ Clipped {input_path.name} to {width}x{height} pixels")
+    print(f"  Saved to: {output_path}")
+
+    return output_path
+
+
+def clip_directory_rasters(
+    input_dir, output_dir, file_pattern="*.tif", width=400, height=400
+):
+    """
+    Clip all raster files matching a pattern in a directory.
+
+    Args:
+        input_dir: Directory containing input rasters
+        output_dir: Directory to save clipped rasters
+        file_pattern: Glob pattern for files to clip (default: "*.tif")
+        width: Width of output rasters in pixels (default: 400)
+        height: Height of output rasters in pixels (default: 400)
+
+    Returns:
+        list: Paths to all clipped files
+    """
+    from pathlib import Path
+
+    input_dir = Path(input_dir)
+    output_dir = Path(output_dir)
+
+    # Find all matching files
+    input_files = list(input_dir.glob(file_pattern))
+
+    if not input_files:
+        print(f"⚠ No files found matching pattern '{file_pattern}' in {input_dir}")
+        return []
+
+    print(f"Found {len(input_files)} files to clip:")
+    clipped_files = []
+
+    for input_file in input_files:
+        output_file = output_dir / input_file.name
+        clipped_path = clip_raster_to_size(
+            input_file, output_file, width=width, height=height
+        )
+        clipped_files.append(clipped_path)
+
+    print(f"\n✓ Clipped {len(clipped_files)} files to {output_dir}")
+    return clipped_files
