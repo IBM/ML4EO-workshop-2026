@@ -120,9 +120,7 @@ def build_terratorch_args(params: dict) -> list:
     Common mappings:
       - lr -> --optimizer.init_args.lr
       - batch_size -> --data.init_args.batch_size
-      - weight_decay -> --optimizer.init_args.weight_decay
-      - dropout -> --model.init_args.dropout
-      
+      - weight_decay -> --optimizer.init_args.weight_decay      
     For unknown parameters, attempts to map them intelligently based on name.
     """
     args = []
@@ -131,7 +129,6 @@ def build_terratorch_args(params: dict) -> list:
     param_mappings = {
         "lr": "--optimizer.init_args.lr",
         "batch_size": "--data.init_args.batch_size",
-        "weight_decay": "--optimizer.init_args.weight_decay",
         "num_workers": "--data.init_args.num_workers",
         # Add more mappings as needed
     }

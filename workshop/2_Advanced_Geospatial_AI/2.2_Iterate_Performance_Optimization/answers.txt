@@ -31,10 +31,10 @@ static:
   epochs: 2               # Number of epochs per trial
 
 hpo:
-  head_dropout:
+  weight_decay:
     type: float
     low: 0.0
-    high: 0.5
+    high: 0.1
     log: false
   # Learning rate (contiuous, log normal sampling )
   lr:
@@ -43,5 +43,5 @@ hpo:
     high: 1.0e-3
     log: true
 
-you also need add this to line 136 to 'train_salt_marsh_trial.py' as it has not been added to param_mappings
-"head_dropout": "--model.init_args.model_args.head_dropout",
+you also need add this to line 135 to 'train_salt_marsh_trial.py' as it has not been added to param_mappings
+"weight_decay": "--optimizer.init_args.weight_decay",

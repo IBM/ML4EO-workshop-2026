@@ -5,13 +5,8 @@ static:
   config: config_salt_marsh.yaml  # Base terratorch configuration
   epochs: 2               # Number of epochs per trial
 
-hpo:
-  # Batch size - categorical choice
-  batch_size:
-    type: categorical
-    choices: [2, 4]
-  
-  # Learning rate (contiuous, log normal sampling )
+hpo:  
+  # Learning rate (continuous, log normal sampling)
   lr:
     type: float
     low: 1.0e-6
