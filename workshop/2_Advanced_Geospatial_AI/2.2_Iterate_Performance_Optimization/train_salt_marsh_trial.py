@@ -129,7 +129,6 @@ def build_terratorch_args(params: dict) -> list:
     param_mappings = {
         "lr": "--optimizer.init_args.lr",
         "batch_size": "--data.init_args.batch_size",
-        "num_workers": "--data.init_args.num_workers",
         # Add more mappings as needed
     }
     
