@@ -21,7 +21,7 @@ hpo:
     log: true
 
 
-2) To add a head dropout you need to modify the 'hpo_config.yaml' to: 
+2) To add a weight_decay you need to modify the 'hpo_config.yaml' to: 
 
 metrics:
   - val_loss  # Metric to optimize (minimize validation loss)
