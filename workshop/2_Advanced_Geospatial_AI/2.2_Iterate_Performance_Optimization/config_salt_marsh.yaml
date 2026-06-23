@@ -26,9 +26,8 @@ data:
   class_path: GenericMultiModalDataModule
   init_args:
     task: segmentation
-    batch_size: 16
-    # batch_size: 1
-    num_workers: 8
+    batch_size: 4
+    num_workers: 1
     constant_scale: 
       S2L2A: 1
       # DEM: 1
