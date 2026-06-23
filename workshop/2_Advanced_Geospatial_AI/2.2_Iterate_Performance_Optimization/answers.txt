@@ -43,5 +43,5 @@ hpo:
     high: 1.0e-3
     log: true
 
-you also need add this to line 135 to 'train_salt_marsh_trial.py' as it has not been added to param_mappings
+you also need add this to line 132 to 'train_salt_marsh_trial.py' as it has not been added to param_mappings
 "weight_decay": "--optimizer.init_args.weight_decay",
