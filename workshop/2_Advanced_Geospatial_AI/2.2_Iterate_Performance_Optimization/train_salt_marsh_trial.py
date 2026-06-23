@@ -117,11 +117,6 @@ def build_terratorch_args(params: dict) -> list:
     Build terratorch CLI arguments from hyperparameters.
     
     Maps parameter names to their corresponding terratorch CLI argument paths.
-    Common mappings:
-      - lr -> --optimizer.init_args.lr
-      - batch_size -> --data.init_args.batch_size
-      - weight_decay -> --optimizer.init_args.weight_decay      
-    For unknown parameters, attempts to map them intelligently based on name.
     """
     args = []
     
