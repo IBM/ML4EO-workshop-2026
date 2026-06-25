@@ -1,0 +1,57 @@
+model_args:
+  backbone_pretrained: true
+  backbone: terramind_v1_base
+  decoder_channels: 256
+  backbone_modalities:
+  - S2L2A
+  backbone_merge_method: mean
+  backbone_bands:
+    S2L2A:
+    - BLUE
+    - GREEN
+    - RED
+    - NIR_NARROW
+    - SWIR_1
+    - SWIR_2
+  num_classes: 2
+  head_dropout: 0.1
+  decoder: FCNDecoder
+  decoder_num_convs: 4
+  head_channel_list:
+  - 256
+  necks:
+  - name: SelectIndices
+    indices:
+    - -1
+  - name: ReshapeTokensToImage
+model_factory: EncoderDecoderFactory
+model: null
+loss: dice
+aux_heads: null
+aux_loss: null
+class_weights: null
+ignore_index: -1
+lr: 0.001
+optimizer: null
+optimizer_hparams: null
+scheduler: null
+scheduler_hparams: null
+freeze_backbone: false
+freeze_decoder: false
+freeze_head: false
+plot_on_val: 10
+class_names: null
+tiled_inference_parameters:
+  h_crop: 256
+  h_stride: 32
+  w_crop: 256
+  w_stride: 32
+  average_patches: true
+test_dataloaders_names: null
+lr_overrides: null
+output_on_inference: prediction
+output_most_probable: true
+path_to_record_metrics: null
+tiled_inference_on_testing: false
+tiled_inference_on_validation: false
+_instantiator: lightning.pytorch.cli.instantiate_module

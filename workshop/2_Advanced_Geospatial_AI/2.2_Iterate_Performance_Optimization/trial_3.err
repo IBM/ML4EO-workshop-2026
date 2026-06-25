@@ -1,0 +1,23 @@
+/Users/annejones/miniforge3/lib/python3.12/importlib/__init__.py:90: FutureWarning: `optuna.integration.pytorch_lightning` has been deprecated in v4.9.0. This feature will be removed in v6.0.0. See https://github.com/optuna/optuna/releases/tag/v4.9.0. Use `optuna_integration.pytorch_lightning` instead.
+  return _bootstrap._gcd_import(name[level:], package, level)
+Seed set to 0
+2026-06-25 17:36:00,372 - INFO - HTTP Request: HEAD https://huggingface.co/ibm-esa-geospatial/TerraMind-1.0-base/resolve/main/TerraMind_v1_base.pt "HTTP/1.1 302 Found"
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-06-25 17:36:00,373 - WARNING - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-06-25 17:36:00,556 - INFO - Loaded weights for BLUE in position 0 of patch embed
+2026-06-25 17:36:00,557 - INFO - Loaded weights for GREEN in position 1 of patch embed
+2026-06-25 17:36:00,557 - INFO - Loaded weights for RED in position 2 of patch embed
+2026-06-25 17:36:00,557 - INFO - Loaded weights for NIR_NARROW in position 3 of patch embed
+2026-06-25 17:36:00,557 - INFO - Loaded weights for SWIR_1 in position 4 of patch embed
+2026-06-25 17:36:00,557 - INFO - Loaded weights for SWIR_2 in position 5 of patch embed
+/Users/annejones/old-macbook/ibm-repos/ML4EO-workshop-2026/.venv/lib/python3.12/site-packages/terratorch/datamodules/generic_multimodal_data_module.py:482: UserWarning: rgb_modality is deprecated and will be removed in a future release. Provide the modalities for plotting as keys in `rgb_indices` with the format {'<modality>': [<band indices>]}.
+  warnings.warn("rgb_modality is deprecated and will be removed in a future release. Provide the modalities "
+/Users/annejones/old-macbook/ibm-repos/ML4EO-workshop-2026/.venv/lib/python3.12/site-packages/lightning/pytorch/cli.py:734: `SemanticSegmentationTask.configure_optimizers` will be overridden by `MyLightningCLI.configure_optimizers`.
+GPU available: True (mps), used: True
+TPU available: False, using: 0 TPU cores
+💡 Tip: For seamless cloud logging and experiment tracking, try installing [litlogger](https://pypi.org/project/litlogger/) to enable LitLogger, which logs metrics and artifacts automatically to the Lightning Experiments platform.
+2026-06-25 17:36:00,589 - INFO - Train dataset: 7
+2026-06-25 17:36:00,589 - INFO - Val dataset: 3
+2026-06-25 17:36:00,831 - INFO - Checking dataset stackability for val split
+2026-06-25 17:36:06,040 - INFO - Checking dataset stackability for train split
+`Trainer.fit` stopped: `max_epochs=2` reached.

@@ -1,0 +1,174 @@
+data:
+  class_path: terratorch.datamodules.GenericMultiModalDataModule
+  init_args:
+    allow_missing_modalities: false
+    allow_substring_file_names: true
+    batch_size: 4
+    channel_position: -3
+    check_stackability: true
+    concat_bands: false
+    constant_scale:
+      S2L2A: 1.0
+    data_with_sample_dim: false
+    dataset_bands:
+      S2L2A:
+      - BLUE
+      - GREEN
+      - RED
+      - NIR_NARROW
+      - SWIR_1
+      - SWIR_2
+    drop_last: true
+    expand_temporal_dimension: false
+    image_grep:
+      S2L2A: '*_img.tif'
+    label_grep: '*_lab.tif'
+    means:
+      S2L2A:
+      - 530.1647429643898
+      - 798.664137050334
+      - 788.9290127562836
+      - 2558.942396063767
+      - 1774.444227123873
+      - 1101.935018300794
+    modalities:
+    - S2L2A
+    no_data_replace: 0.0
+    no_label_replace: -1.0
+    num_classes: 2
+    num_workers: 1
+    output_bands:
+      S2L2A:
+      - BLUE
+      - GREEN
+      - RED
+      - NIR_NARROW
+      - SWIR_1
+      - SWIR_2
+    pin_memory: false
+    reduce_zero_label: false
+    rgb_indices:
+    - 0
+    - 1
+    - 2
+    rgb_modality: RGB
+    sample_replace: false
+    shared_transforms: true
+    skip_file_checks: false
+    stds:
+      S2L2A:
+      - 275.17493711717844
+      - 316.9247986961961
+      - 539.6066170066144
+      - 1625.0164464430488
+      - 1136.4428972983876
+      - 780.1759822579997
+    task: segmentation
+    test_data_root:
+      S2L2A: ../../data/data_v3/val
+    test_label_data_root: ../../data/data_v3/val
+    test_transform:
+    - class_path: albumentations.CenterCrop
+      init_args:
+        height: 224
+        width: 224
+    - class_path: albumentations.pytorch.transforms.ToTensorV2
+      init_args:
+        p: 1.0
+        transpose_mask: false
+    train_data_root:
+      S2L2A: ../../data/data_v3/train
+    train_label_data_root: ../../data/data_v3/train
+    train_transform:
+    - class_path: albumentations.RandomCrop
+      init_args:
+        height: 256
+        width: 256
+    - class_path: albumentations.pytorch.transforms.ToTensorV2
+      init_args:
+        p: 1.0
+        transpose_mask: false
+    val_data_root:
+      S2L2A: ../../data/data_v3/val
+    val_label_data_root: ../../data/data_v3/val
+    val_transform:
+    - class_path: albumentations.CenterCrop
+      init_args:
+        height: 224
+        width: 224
+    - class_path: albumentations.pytorch.transforms.ToTensorV2
+      init_args:
+        p: 1.0
+        transpose_mask: false
+deploy_config_file: true
+model:
+  class_path: terratorch.tasks.SemanticSegmentationTask
+  init_args:
+    freeze_backbone: false
+    freeze_decoder: false
+    freeze_head: false
+    ignore_index: -1
+    loss: dice
+    lr: 0.001
+    model_args:
+      backbone: terramind_v1_base
+      backbone_bands:
+        S2L2A:
+        - BLUE
+        - GREEN
+        - RED
+        - NIR_NARROW
+        - SWIR_1
+        - SWIR_2
+      backbone_merge_method: mean
+      backbone_modalities:
+      - S2L2A
+      backbone_pretrained: false
+      decoder: FCNDecoder
+      decoder_channels: 256
+      decoder_num_convs: 4
+      head_channel_list:
+      - 256
+      head_dropout: 0.1
+      necks:
+      - indices:
+        - -1
+        name: SelectIndices
+      - name: ReshapeTokensToImage
+      num_classes: 2
+    model_factory: EncoderDecoderFactory
+    output_most_probable: true
+    output_on_inference: prediction
+    plot_on_val: 10
+    tiled_inference_on_testing: false
+    tiled_inference_on_validation: false
+    tiled_inference_parameters:
+      average_patches: true
+      h_crop: 256
+      h_stride: 32
+      w_crop: 256
+      w_stride: 32
+out_dtype: int16
+seed_everything: 0
+trainer:
+  accelerator: gpu
+  accumulate_grad_batches: 1
+  barebones: false
+  check_val_every_n_epoch: 1
+  detect_anomaly: false
+  devices: auto
+  enable_autolog_hparams: true
+  enable_checkpointing: true
+  fast_dev_run: false
+  inference_mode: true
+  log_every_n_steps: 1
+  logger: false
+  max_epochs: 2
+  max_steps: -1
+  num_nodes: 1
+  overfit_batches: 0.0
+  precision: 16-mixed
+  reload_dataloaders_every_n_epochs: 0
+  strategy: auto
+  sync_batchnorm: false
+  use_distributed_sampler: true
