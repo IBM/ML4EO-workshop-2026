@@ -2765,7 +2765,7 @@ wheels = [
 [[package]]
 name = "ml4eo-workshop-2026"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "gdown" },
     { name = "huggingface-hub" },
