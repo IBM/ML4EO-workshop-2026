@@ -17,6 +17,8 @@ dependencies = [
     "terrakit>=0.1.8.post1",
     "huggingface-hub",
     "gdown>=6.1.0",
+    "optuna>=4.9.0",
+    "optuna-dashboard>=0.20.0",
 ]
 
 
