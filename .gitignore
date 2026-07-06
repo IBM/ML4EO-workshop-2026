@@ -187,3 +187,10 @@ cython_debug/
 **/data/*
 .DS_Store
 **/.ckpt
+
+# Optuna
+*.err
+*.out
+*.db
+hpo_trial_*/
+lightning_logs/
