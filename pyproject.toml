@@ -17,7 +17,14 @@ dependencies = [
     "terrakit>=0.1.8.post1",
     "huggingface-hub",
     "gdown>=6.1.0",
+    "optuna>=4.9.0",
+    "optuna-dashboard>=0.20.0",
 ]
+
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["workshop*"]
 
 [dependency-groups]
 dev = [
@@ -29,3 +36,7 @@ dev = [
 
 [tool.uv.sources]
 detect-secrets = { git = "https://github.com/ibm/detect-secrets.git", rev = "master" }
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
