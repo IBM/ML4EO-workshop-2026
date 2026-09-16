@@ -29,9 +29,6 @@ include = ["workshop*"]
 [dependency-groups]
 dev = [
     "detect-secrets",
-    "ipykernel>=7.2.0",
-    "jupyter>=1.1.1",
-    "ruff>=0.14.13",
 ]
 
 [tool.uv.sources]
